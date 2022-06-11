@@ -18,6 +18,7 @@ void pdp_8_execute_register();
 void pdp_8_run();
 
 void memoryDump();
+void loadProgram();
 
 extern int t[4], c[4], fr[2], q[8];
 extern bool S;

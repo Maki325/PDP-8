@@ -3,8 +3,9 @@
 int add(int *a, int *b, int *out, int n) {
   int carry = 0;
   for(int i = n - 1; i >= 0; i--) {
-    out[i] = XOR(XOR(a[i], b[i]), carry);
-    carry = OR(AND(XOR(a[i], b[i]), carry), AND(a[i], b[i]));
+    int x = a[i], y = b[i];
+    out[i] = XOR(XOR(x, y), carry);
+    carry = OR(AND(XOR(x, y), carry), AND(x, y));
   }
 
   return carry;
@@ -37,4 +38,13 @@ int binToDec(int *bin, int n) {
     dec = dec * 2 + bin[i];
   }
   return dec;
+}
+
+bool isZero(int *mem, int n) {
+  for(int i = 0;i < n;i++) {
+    if(mem[i] != 0) {
+      return false;
+    }
+  }
+  return true;
 }

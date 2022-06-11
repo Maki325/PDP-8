@@ -7,5 +7,6 @@
 // F&R -> 4 takta
 
 int main(void) {
+  loadProgram();
   pdp_8_run();
 }

@@ -4,21 +4,52 @@
 #include "arithmetics.h"
 #include "inttypes.h"
 
+void printArray(int *a, int n) {
+  for(int i = 0;i < n;i++) {
+    printf("%d ", a[i]);
+  }
+  printf("\n");
+}
+
 void memoryDump() {
   FILE *f = fopen("dump.bin", "w");
   for(int i = 0;i < 4096 * WORD_SIZE;i += 8) {
     uint8_t byte = 0;
-    if(RAM[i + 0]) byte |= 1UL << 0;
-    if(RAM[i + 1]) byte |= 1UL << 1;
-    if(RAM[i + 2]) byte |= 1UL << 2;
-    if(RAM[i + 3]) byte |= 1UL << 3;
-    if(RAM[i + 4]) byte |= 1UL << 4;
-    if(RAM[i + 5]) byte |= 1UL << 5;
-    if(RAM[i + 6]) byte |= 1UL << 6;
-    if(RAM[i + 7]) byte |= 1UL << 7;
+    if(RAM[i + 0]) byte |= 1UL << 7;
+    if(RAM[i + 1]) byte |= 1UL << 6;
+    if(RAM[i + 2]) byte |= 1UL << 5;
+    if(RAM[i + 3]) byte |= 1UL << 4;
+    if(RAM[i + 4]) byte |= 1UL << 3;
+    if(RAM[i + 5]) byte |= 1UL << 2;
+    if(RAM[i + 6]) byte |= 1UL << 1;
+    if(RAM[i + 7]) byte |= 1UL << 0;
     fwrite(&byte, sizeof(uint8_t), 1, f);
   }
   fclose(f);
+}
+
+void loadProgram() {
+  FILE *f = fopen("program.bin", "r");
+  fseek(f, 0, SEEK_END);
+  long filelen = ftell(f);
+  rewind(f);
+
+  for(int i = 0; i < filelen; i++) {
+    uint8_t byte = 0;
+    fread(&byte, 1, 1, f);
+
+    RAM[8 * i + 0] = (byte >> 7) & 1U;
+    RAM[8 * i + 1] = (byte >> 6) & 1U;
+    RAM[8 * i + 2] = (byte >> 5) & 1U;
+    RAM[8 * i + 3] = (byte >> 4) & 1U;
+    RAM[8 * i + 4] = (byte >> 3) & 1U;
+    RAM[8 * i + 5] = (byte >> 2) & 1U;
+    RAM[8 * i + 6] = (byte >> 1) & 1U;
+    RAM[8 * i + 7] = (byte >> 0) & 1U;
+  }
+
+  fclose(f);
+  S = true;
 }
 
 void pdp_8_fetch() {
@@ -136,7 +167,7 @@ void pdp_8_execute_isz() {
     inc(&RAM[WORD_SIZE * location], WORD_SIZE);
   } else if(t[2]) {
     int location = binToDec(MAR, 12);
-    if(&RAM[WORD_SIZE * (location + 1)] == 0) {
+    if(isZero(&RAM[WORD_SIZE * location], WORD_SIZE)) {
       inc(PC, 12);
     }
   } else if(t[3]) {
@@ -171,14 +202,7 @@ void pdp_8_execute_register() {
     if(AC[0])
       inc(PC, 12);
   } else if(MBR[13]) {
-    int zero = true;
-    for(int i = 0;i < WORD_SIZE;i++) {
-      if(AC[i] != 0) {
-        zero = false;
-        break;
-      }
-    }
-    if(zero)
+    if(isZero(AC, WORD_SIZE))
       inc(PC, 12);
   } else if(MBR[14]) {
     if(!E)
