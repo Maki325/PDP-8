@@ -1,5 +1,11 @@
 {
   "files.associations": {
-    "main.c": "c"
+    "main.c": "c",
+    "memory.h": "c",
+    "stdio.h": "c",
+    "includes.h": "c",
+    "decoder.h": "c",
+    "random": "c",
+    "arithmetics.h": "c"
   }
 }
