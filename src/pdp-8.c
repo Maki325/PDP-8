@@ -28,8 +28,8 @@ void memoryDump() {
   fclose(f);
 }
 
-void loadProgram() {
-  FILE *f = fopen("program.bin", "r");
+void loadProgram(char *inputFile) {
+  FILE *f = fopen(inputFile, "r");
   fseek(f, 0, SEEK_END);
   long filelen = ftell(f);
   rewind(f);
@@ -247,7 +247,6 @@ void pdp_8_run() {
 
     inc(SC, 2);
   }
-  memoryDump();
 }
 
 // Variable defenitions

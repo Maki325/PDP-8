@@ -18,7 +18,7 @@ void pdp_8_execute_register();
 void pdp_8_run();
 
 void memoryDump();
-void loadProgram();
+void loadProgram(char *inputFile);
 
 extern int t[4], c[4], fr[2], q[8];
 extern bool S;

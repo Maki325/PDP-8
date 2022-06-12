@@ -1,6 +1,8 @@
-LDA [number]
+LDA number
 ADD [number2]
 STA number
+ADD [number2]
+STA number2
 
 HLT
 
