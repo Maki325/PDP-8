@@ -30,7 +30,11 @@ bool isNumber(char *string, size_t len) {
   size_t start = string[0] == '-' ? 1 : 0;
   for(size_t i = start;i < len;i++) {
     if(string[i] > '9' || string[i] < '0') {
-      return false;
+      if(string[i] > 'f' || string[i] < 'a') {
+        if(string[i] > 'F' || string[i] < 'A') {
+          return false;
+        }
+      }
     }
   }
   return true;
