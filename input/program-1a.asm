@@ -1,0 +1,8 @@
+LDA 6
+ADD* 7
+STA 6
+ADD* 7
+STA 7
+HLT
+DEC 10
+DEC 19

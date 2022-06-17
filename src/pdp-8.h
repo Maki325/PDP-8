@@ -1,6 +1,7 @@
 #ifndef PDP_8_H
 #define PDP_8_H
 #include "includes.h"
+#include "assembler.h"
 
 void pdp_8_fetch();
 void pdp_8_indirect();
@@ -17,8 +18,8 @@ void pdp_8_execute_register();
 
 void pdp_8_run();
 
-void memoryDump();
-void loadProgram(char *inputFile);
+void memoryDump(char *out);
+void loadProgram(Program *program);
 
 extern int t[4], c[4], fr[2], q[8];
 extern bool S;

@@ -3,6 +3,7 @@
 #include "memory.h"
 #include "arithmetics.h"
 #include "inttypes.h"
+#include "utils.h"
 
 void printArray(int *a, int n) {
   for(int i = 0;i < n;i++) {
@@ -11,8 +12,8 @@ void printArray(int *a, int n) {
   printf("\n");
 }
 
-void memoryDump() {
-  FILE *f = fopen("dump.bin", "w");
+void memoryDump(char *out) {
+  FILE *f = fopen(out ? out : "dump.bin", "w");
   for(int i = 0;i < 4096 * WORD_SIZE;i += 8) {
     uint8_t byte = 0;
     if(RAM[i + 0]) byte |= 1UL << 7;
@@ -28,27 +29,29 @@ void memoryDump() {
   fclose(f);
 }
 
-void loadProgram(char *inputFile) {
-  FILE *f = fopen(inputFile, "r");
-  fseek(f, 0, SEEK_END);
-  long filelen = ftell(f);
-  rewind(f);
+void loadProgram(Program *program) {
+  const int maxValue = 2048;
+  int bits[16];
+  
+  for(size_t i = 0;i < program->count;i++) {
+    Instruction *instruction = &program->instructions[i];
+    if(instruction->type == NULL) {
+      getNumberBits(instruction->value, 16, bits);
+      copy(bits, &RAM[(program->location + i) * WORD_SIZE], WORD_SIZE);
+      continue;
+    }
+    uint16_t mask = instruction->type->mask;
+    if(instruction->indirect) mask |= INDIRECT_MASK;
+    if(instruction->location != -1)
+      mask |= instruction->location > maxValue ? maxValue : instruction->location < -maxValue ? -maxValue : instruction->location;
 
-  for(int i = 0; i < filelen; i++) {
-    uint8_t byte = 0;
-    fread(&byte, 1, 1, f);
-
-    RAM[8 * i + 0] = (byte >> 7) & 1U;
-    RAM[8 * i + 1] = (byte >> 6) & 1U;
-    RAM[8 * i + 2] = (byte >> 5) & 1U;
-    RAM[8 * i + 3] = (byte >> 4) & 1U;
-    RAM[8 * i + 4] = (byte >> 3) & 1U;
-    RAM[8 * i + 5] = (byte >> 2) & 1U;
-    RAM[8 * i + 6] = (byte >> 1) & 1U;
-    RAM[8 * i + 7] = (byte >> 0) & 1U;
+    getNumberBits(mask, 16, bits);
+    copy(bits, &RAM[(program->location + i) * WORD_SIZE], WORD_SIZE);
   }
 
-  fclose(f);
+  clear(bits, 16);
+  getNumberBits(program->location, 16, bits);
+  copy(bits, PC, 12);
   S = true;
 }
 
