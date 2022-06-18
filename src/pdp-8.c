@@ -13,7 +13,7 @@ void printArray(int *a, int n) {
 }
 
 void memoryDump(char *out) {
-  FILE *f = fopen(out ? out : "dump.bin", "w");
+  FILE *f = fopen(out ? out : "dump.bin", "wb");
   for(int i = 0;i < 4096 * WORD_SIZE;i += 8) {
     uint8_t byte = 0;
     if(RAM[i + 0]) byte |= 1UL << 7;
@@ -36,7 +36,8 @@ void loadProgram(Program *program) {
   for(size_t i = 0;i < program->count;i++) {
     Instruction *instruction = &program->instructions[i];
     if(instruction->type == NULL) {
-      getNumberBits(instruction->value, 16, bits);
+      clear(bits, WORD_SIZE);
+      getNumberBits(instruction->value, 12, &bits[4]);
       copy(bits, &RAM[(program->location + i) * WORD_SIZE], WORD_SIZE);
       continue;
     }
@@ -108,7 +109,7 @@ void pdp_8_execute_add() {
     int location = binToDec(MAR, 12);
     copy(&RAM[WORD_SIZE * location], MBR, WORD_SIZE);
   } else if(t[2]) {
-    E = add(AC, MBR, AC, WORD_SIZE);
+    E = add(&AC[4], &MBR[4], &AC[4], 12);
   } else if(t[3]) {
     F = 0;
   }
