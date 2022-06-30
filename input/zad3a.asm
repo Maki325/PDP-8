@@ -1,0 +1,21 @@
+LDA b
+CMA
+INC
+STA nb
+LDA a
+ADD nb
+SPA
+BUN 9
+HLT
+LDA sum
+ADD a
+STA sum
+LDA a
+INC
+STA a
+BUN 4
+
+a, DEC 1
+b, DEC 3
+nb, DEC 0
+sum, DEC 0

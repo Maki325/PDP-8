@@ -35,7 +35,7 @@ typedef enum InstructionMask {
   SZE_MASK      = 0b0111000000000010,
   HLT_MASK      = 0b0111000000000001,
 
-  MASK_NONE,
+  MASK_NONE     = 0b0111111000000000,
 } InstructionMask;
 
 extern const InstructionType InstructionTypes[];

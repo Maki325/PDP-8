@@ -1,4 +1,6 @@
 #include "utils.h"
+#include "memory.h"
+#include "arithmetics.h"
 #include <ctype.h>
 
 void printn(const char* string, size_t length) {
@@ -26,10 +28,11 @@ int trimRight(const char *text, size_t *length) {
   return i;
 }
 
-bool isNumber(char *string, size_t len) {
+bool isNumber(char *string, size_t len, bool checkHex) {
   size_t start = string[0] == '-' ? 1 : 0;
   for(size_t i = start;i < len;i++) {
     if(string[i] > '9' || string[i] < '0') {
+      if(!checkHex) return false;
       if(string[i] > 'f' || string[i] < 'a') {
         if(string[i] > 'F' || string[i] < 'A') {
           return false;
@@ -93,10 +96,16 @@ void printProgram(Program *program) {
 }
 
 void getNumberBits(int number, int bitswanted, int *out) {
+  bool negative = number < 0;
+  if(negative) number = -number;
   for(int k = 0;k < bitswanted;k++){
     int mask =  1 << k;
     int masked_n = number & mask;
     int thebit = masked_n >> k;
     out[bitswanted - 1 - k] = thebit;
+  }
+  if(negative) {
+    invert(out, bitswanted);
+    inc(out, bitswanted);
   }
 }

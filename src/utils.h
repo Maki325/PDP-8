@@ -8,7 +8,7 @@ void printn(const char* string, size_t length);
 int trimLeft(char **text, size_t *length);
 int trimRight(const char *text, size_t *length);
 
-bool isNumber(char *string, size_t len);
+bool isNumber(char *string, size_t len, bool checkHex);
 int strToInt(char *string, size_t len);
 int hexToInt(char *string, size_t len);
 

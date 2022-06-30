@@ -31,13 +31,13 @@ void memoryDump(char *out) {
 
 void loadProgram(Program *program) {
   const int maxValue = 2048;
-  int bits[16];
+  int bits[WORD_SIZE];
   
   for(size_t i = 0;i < program->count;i++) {
+    clear(bits, WORD_SIZE);
     Instruction *instruction = &program->instructions[i];
     if(instruction->type == NULL) {
-      clear(bits, WORD_SIZE);
-      getNumberBits(instruction->value, 12, &bits[4]);
+      getNumberBits(instruction->value, 16, bits);
       copy(bits, &RAM[(program->location + i) * WORD_SIZE], WORD_SIZE);
       continue;
     }
@@ -52,7 +52,7 @@ void loadProgram(Program *program) {
 
   clear(bits, 16);
   getNumberBits(program->location, 16, bits);
-  copy(bits, PC, 12);
+  copy(&bits[4], PC, 12);
   S = true;
 }
 
@@ -109,7 +109,7 @@ void pdp_8_execute_add() {
     int location = binToDec(MAR, 12);
     copy(&RAM[WORD_SIZE * location], MBR, WORD_SIZE);
   } else if(t[2]) {
-    E = add(&AC[4], &MBR[4], &AC[4], 12);
+    E = add(AC, MBR, AC, 16);
   } else if(t[3]) {
     F = 0;
   }
@@ -200,7 +200,7 @@ void pdp_8_execute_register() {
   } else if(MBR[10]) {
     inc(AC, WORD_SIZE);
   } else if(MBR[11]) {
-    if(!AC[0])
+    if(!AC[0] && !isZero(AC, WORD_SIZE))
       inc(PC, 12);
   } else if(MBR[12]) {
     if(AC[0])
@@ -214,6 +214,7 @@ void pdp_8_execute_register() {
   } else if(MBR[15]) {
     S = false;
   }
+  F = 0;
 }
 
 void pdp_8_run() {

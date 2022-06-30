@@ -66,7 +66,7 @@ void addProgramLabelLocations(Program *program, char *label, int location) {
 void tokenizeInstruction(Program *program, char *line, size_t start, size_t end, bool *isArgumentP, int *labelStepP) {
   if(*isArgumentP) {
     size_t len = end - start;
-    if(isNumber(&line[start], len)) {
+    if(isNumber(&line[start], len, false)) {
       program->instructions[program->count - 1].location = strToInt(&line[start], len);
     } else {
       program->instructions[program->count - 1].label = calloc(len + 1, sizeof(char));
@@ -166,6 +166,10 @@ Program *tokenize(char *filePath) {
 }
 
 void updateLocations(Program *program) {
+  // for(size_t j = 0;j < program->labelLocationsCount;j++) {
+  //   printf("Location[%zu]: %s - %d\n", j, program->labelLocations[j].label, program->labelLocations[j].location);
+  // }
+
   for(size_t i = 0;i < program->count;i++) {
     Instruction *instruction = &program->instructions[i];
     if(!instruction->label) continue;
